@@ -1,6 +1,0 @@
-NL: cascade werkt niet volledig (denk ik), online mist de input signal. Gebruik alleen ter inspiratie. De doc bevat ook een paar technische fouten. De assembly maakt geen gebruik van parallelisme, dus zorgt dat als je de assembly versie gaat schrijven, dat je parallelisme gebruikt.
-EN: cascade doesn't entirely work (I believe), online needs an input signal. Use only as a reference. The report contains a few technical errors. The assembly doesn't make any use of parallelism, this is something you can improve upon when doing the assignment yourself. ( instead of mindlessly copying from studforum ;) ;) ;) )
-
-Tip for the assembly part: you can generate the assembly files by going into project Properties (right-click on project)->Build->C5500 Cumpiler->Advanced Options->Assembler Options and check the "Keep the generated assembly language (.asm) file" (first option). but firstly compile in Release instead of Debug. Then go look at the generated assembly file in the "Release" folder of your project. Have fun copying from the most efficient assembly code derived from your c implementation. (hint: don't copy the modulo or mpyli calls or they realize you're cheating) 
-
-geen zin om dit nog eens in het nederlands te schrijven lol
