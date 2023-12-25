@@ -73,7 +73,7 @@ plt.show()
 if write_to_file_flag:
     # fix point in format 32q31 (32 bit signed integer, 31 bit fraction) expressed using astype
     import file_parser as fp
-    q = 31
-    signal_q = (signal * (2 ** q)).astype(np.int32)
+    q = 15
+    signal_q = (signal * (2 ** q)).astype(np.int16)
     datapath = 'input.pcm'
     fp.writes(signal_q, datapath)
