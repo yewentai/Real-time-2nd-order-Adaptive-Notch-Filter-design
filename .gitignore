@@ -4,6 +4,7 @@
 # CCS files
 Debug/
 targetConfigs/
+USBSTK5515bsl/
 .project
 lnkx.cmd
 
