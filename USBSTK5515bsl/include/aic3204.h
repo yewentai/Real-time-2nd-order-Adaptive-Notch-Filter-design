@@ -46,6 +46,14 @@
 #ifndef AIC3204_H_
 #define AIC3204_H_
 
+#ifndef Uint16
+typedef unsigned short Uint16;
+#endif
+
+#ifndef Int16
+typedef short Int16;
+#endif
+
  #define AIC3204_I2C_ADDR 0x18
 
  #define XmitL 0x10

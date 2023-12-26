@@ -12,9 +12,9 @@
 
 	 .mmregs
 
-	MU 		 .set  0xC8
-	LAMBDA	 .set  0x0x73333333
-	LAMBDA2  .set  0xCCCCCCC
+	MU 		 		.set  0xC8
+	LAMBDA	 		.set  0xE666
+	LAMBDA_REMAIN	.set  0x199A
 
 ; Functions callable from C code
 
@@ -27,7 +27,7 @@
 ; int anf(int y,				=> T0
 ;		  int *x,				=> AR0 (state buffer)
 ;		  int *a,				=> AR1 (adaptive coefficient)
-; 		  int *rho,				=> AR2
+; 		  unsigned int *rho,				=> AR2
 ;	      unsigned int* index	=> AR3
 ;		 );						=> T0: output argument (e in this case) must be stored in T0 at the end of code
 ;

@@ -24,15 +24,15 @@ int main( void )
 	FILE  *fpIn;
 	FILE  *fpOut;
 	
-	char  tempc[4];
+	char  temp[2];
 
-	int s[3] = {0,0,0};
-	int a[2] = {0,0};
-	int rho[2] = {0x66666666,0x66666666}; // Fixed-point representation of 0.8 in 32q31 format
+	int s[3] = {0};
+	int a[2] = {0x2000};
+	int rho[2] = {0x6666}; // Fixed-point representation of 0.8 in 32q31 format
 	// int rho[2] = {0, 0}; // rho adaptive {rho=?, rho_inf}
 
-	fpIn = fopen("..\\data\\in.pcm", "rb");
-	fpOut = fopen("..\\data\\out.pcm", "wb");
+	fpIn = fopen("..\\data\\input.pcm", "rb");
+	fpOut = fopen("..\\data\\output.pcm", "wb");
 
 	if (fpIn == NULL || fpOut == NULL) {
 	    printf("Can't open input or output file. Exiting. \n");
@@ -40,20 +40,18 @@ int main( void )
 	}
 
     //Begin filtering the data
-    while (fread(tempc, sizeof(char), 4, fpIn) == 4) {
-        // Convert 4 bytes to 32-bit integer assuming little-endian format
-        y = (tempc[0] & 0xFF) | ((tempc[1] & 0xFF) << 8) | ((tempc[2] & 0xFF) << 16) | (tempc[3] << 24);
+    while (fread(temp, sizeof(char), 2, fpIn) == 2) {
+        // Convert 2 bytes to 16-bit integer assuming little-endian format
+        y = (temp[0] & 0xFF) | (temp[1] << 8);
         
         // Call ANF function; ensure anf() is implemented for fixed-point
-        e = anf(y, s, &a, &rho, &index); // Adaptive Notch Filter.
+        e = anf(y, &s[0], &a[0], &rho[0], &index); // Adaptive Notch Filter.
         
-        // Convert 32-bit integer back to 4 bytes in little-endian format
-        tempc[0] = e & 0xFF;
-        tempc[1] = (e >> 8) & 0xFF;
-        tempc[2] = (e >> 16) & 0xFF;
-        tempc[3] = (e >> 24) & 0xFF;
+        // Convert 16-bit integer back to 2 bytes in little-endian format
+        temp[0] = (short) (e & 0x00FF);
+        temp[1] = (short) (e & 0xFF00) >> 8;
         
-        fwrite(tempc, sizeof(char), 4, fpOut);
+        fwrite(temp, sizeof(char), 2, fpOut);
     }
 
     fclose(fpIn);

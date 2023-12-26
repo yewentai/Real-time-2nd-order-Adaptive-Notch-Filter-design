@@ -1,6 +1,6 @@
 #include "anf.h"
 
-int anf(short y, short *s, short *a, unsigned short* rho, unsigned int* index)
+int anf(int y, int *s, int *a, unsigned int* rho, unsigned int* index)
 {
     /*
      y in Q : newly captured sample
@@ -11,11 +11,10 @@ int anf(short y, short *s, short *a, unsigned short* rho, unsigned int* index)
      index : points to (t-1) sample (t current time index) in s -> circular buffer
      */
 
-    short e; // Error signal
+    int e; // Error signal
     long AC0, AC1; // Temporay 32 bit accumulator variables to avoid overflow
     // Update the buffer index for the circular buffer implementation
-    short k = *index;
-
+    int k = *index; // k is now pointing in fact ot m -1
     /** ANF-LMS Algorithm implementation */ 
     /** 
      * Step 1: Update rho(m) = lambda * rho(m - 1) + one_minus_lambda * rho(inf)
@@ -31,7 +30,7 @@ int anf(short y, short *s, short *a, unsigned short* rho, unsigned int* index)
     AC1 = (long)one_minus_lambda * rho[1]; /* multiplication with long to reserve enough bits avoid overflow => 16q15 * 16q16 = 32q31 */
     // AC1 += 0x00004000;  /** Round the part we'll be truncating (Carry bit of this sum will be the LSB after conversion)*/
     AC1 >>= RHO_Q_FORMAT; /** Shift q-format bits right to fix-point => Now AC1 is 32q15 */
-    rho[0] = (unsigned short) ((AC0 + AC1) >> 1); /** update rho[m] => Convert back to 16q16*/
+    rho[0] = (unsigned int) ((AC0 + AC1) >> 1); /** update rho[m] => Convert back to 16q16*/
  
     /** 
      * Step 2: Update s(m) = y(m) + rho(m)a(m - 1)s(m - 1) - rho(m)^2 s(m - 2)
@@ -42,42 +41,62 @@ int anf(short y, short *s, short *a, unsigned short* rho, unsigned int* index)
     long rho_square = (long)rho[0] * rho[0]; // 16q16 * 16q16 = 32q32
     rho_square >>= RHO_Q_FORMAT; // Now rho_square is 32q16
 
-    // Calculate the first term of s[m]: rho(m) * a(m - 1) * s(m - 1)
-    AC0 = (long)rho[0] * a[k-1]; // 16q16 * 16q15 = 32q31
+    // Calculate the first term of s[m]: rho(m) * a(m - 1) * s(m - 1) with k = (m - 1)
+    AC0 = (long)rho[0] * a[k]; // 16q16 * 16q15 = 32q31
     AC0 += 0x4000; // // Add half (since we are shifting 15 bits) to round
     AC0 >>= A_Q_FORMAT; // Now AC0 is 32q16 to match with rho_square
-    AC0 *= s[k-1]; // 32q16 * 16q15 (assuming s is in q15 format) = 32q31
+    AC0 *= s[k]; // 32q16 * 16q15 (assuming s is in q15 format) = 32q31
     AC0 += 0x4000; // Add half to round
     AC0 >>= A_Q_FORMAT; // Normalize to 32q16
 
+    // Calculate the a(m - 1)s(m - 1) term in e computation at current instance
+    long AC2 = -(long)a[k] * s[k]; // 16q15 * 16q15 = 32q30
+    AC2 += 0x4000;
+    AC2 >>= A_Q_FORMAT; // Normalize to 32q15
+
+    k = (k + 1) % 3; // circulat buffer => k++ means one sample stored earlier k++ => (m - 2)
+
     // Calculate the second term of s[m]: rho(m)^2 * s(m - 2)
-    AC1 = rho_square * s[k-2]; // 32q16 * 16q15 = 48q31
+    AC1 = rho_square * s[k]; // 32q16 * 16q15 = 32q31
     AC1 += 0x4000; // Add half to round
     AC1 >>= A_Q_FORMAT; // Normalize to 32q16
 
+    // Integrate the s(m-2) to the -(long)a(m-1) * s(m-1)
+    e = (short)((long)s[k] + (long)AC2 ); // 16q15 + 16q15  
+
+    k = (k + 1) % 3; // circulat buffer => k++ means one sample earlier k++ => m - 3 => m
+
     // Combine terms and update s[m], ensuring all values are in 16q15 format before addition
-    s[k] = (short)(((long)y << 1) + AC0 - AC1); // Convert y to 32q16, add/subtract, convert result back to 16q15
+    s[k] = (short)((((long)y << 1) + AC0 - AC1) >> 16); // Convert y to 32q16, add/subtract, convert result back to 16q15
 
     /** 
      * Step 3: Update error e(m) = s(m) - a(m - 1)s(m - 1) + s(m - 2)
      * modify e section 
      * compute terms for s[m]
      * */ 
-    e = (short)(((long)s[k] - (a[k-1] * s[k-1]) >> A_Q_FORMAT) - s[k-2]); // Use 32-bit math for subtraction
+    e += s[k];
 
     // Step 3: Update a[m]
-    // Assuming mu is in 16q16 format
-    AC0 = (long)mu * e; // 16q16 * 16q15 = 32q31
-    AC0 = (AC0 * s[k-1]) >> A_Q_FORMAT; // 32q31 * 16q15 = 32q46, then normalize to 32q31
-    a[k] = (short)(a[k-1] + (AC0 >> A_Q_FORMAT)); // Convert result back to 16q15
+    // Assuming mu is in 16q15 format
+    AC0 = (long)mu * e; // 16q15 * 16q15 = 32q30
+    AC0 += 0x4000; // half for rounding, correct?
+    AC0 >>= A_Q_FORMAT; // 32q15
+    // Aadvance k to get to previous sample (from m to m -1 )
+    k = (k + 1) % 3;
+    AC0 = ((long)AC0 * s[k]); // 32q15 * 16q15 = 32q30
+    AC0 += 0x4000; // half for rounding
+    a[k] = (short)(a[k] + (AC0 >> A_Q_FORMAT)); // Convert result back to 16q15
     
-    // necessary check to see if |a| < 2
-    if (a < -0x4000)
-        a = -0x4000;
-    if (a > 0x4000)
-        a= 0x4000;
+    // Advance k back to m
+    k = (k + 2) % 3;
 
-    *index = (k + 1) % 3; // Update the circular buffer index
+    // necessary check to see if |a| < 2
+    if (*a < -0x4000)
+        *a = -0x4000;
+    if (*a > 0x4000)
+        *a= 0x4000;
+
+    *index = k; // Update the circular buffer index
 
     return e; // Return the error signal
 }
