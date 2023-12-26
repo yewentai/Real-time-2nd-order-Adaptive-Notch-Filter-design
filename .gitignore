@@ -1,2 +1,12 @@
 # MacOS
 .DS_Store
+
+# CCS files
+Debug/
+targetConfigs/
+.project
+lnkx.cmd
+
+# vscode files
+.vscode/
+__pycache__/
