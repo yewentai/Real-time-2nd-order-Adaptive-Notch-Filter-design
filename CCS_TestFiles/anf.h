@@ -19,9 +19,9 @@
 #define mu 0xC8 // 16q15, approximately 200 in decimal
 
 // Define lambda and one_minus_lambda for 0q16 format
-// Both are always < 1, hence using 0q16 format
-#define lambda 0xE666 // Approximately 0.9 in 0q16 format
-#define one_minus_lambda 0x199A // Approximately 0.1 in 0q16 format
+// Both are always <= 1, hence using 16q15 format
+#define lambda 0x7333 // Approximately 0.9 in 16q15 format
+#define one_minus_lambda 0x0CCD // Approximately 0.1 in 16q15 format
 
 int anf(int y, int *s , int *a, unsigned int* rho, unsigned int* index);
 

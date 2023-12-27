@@ -37,7 +37,7 @@ int anf(int y, int *s, int *a, unsigned int* rho, unsigned int* index)
      * modify s section 
      * compute rho[0] square
      * compute terms for s[m]*/ 
-    // Calculate rho squared in 32q16 format to avoid overflow
+    // Calculate rho squared avoiding overflow
     long rho_square = (long)rho[0] * rho[0]; // 16q16 * 16q16 = 32q32
     rho_square >>= RHO_Q_FORMAT; // Now rho_square is 32q16
 
@@ -79,6 +79,7 @@ int anf(int y, int *s, int *a, unsigned int* rho, unsigned int* index)
     // Step 3: Update a[m]
     // Assuming mu is in 16q15 format
     AC0 = (long)mu * e; // 16q15 * 16q15 = 32q30
+    AC0 <<= 1; // 2 * µ * e(m)
     AC0 += 0x4000; // half for rounding, correct?
     AC0 >>= A_Q_FORMAT; // 32q15
     // Aadvance k to get to previous sample (from m to m -1 )

@@ -2,6 +2,7 @@
     "files.associations": {
         "dsplib.h": "c",
         "tms320.h": "c",
-        "aic3204.h": "c"
+        "aic3204.h": "c",
+        "anf.h": "c"
     }
 }

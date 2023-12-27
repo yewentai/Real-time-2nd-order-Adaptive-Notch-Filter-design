@@ -62,6 +62,7 @@ _anf:
 		; k = *index;
 		mov *AR3, T1
 
+		; Modify rho setion
 		; AC0 = (long)lambda * rho[0];
     	; AC0 += 0x00004000;
     	mov #4000h, AC0
@@ -83,10 +84,10 @@ _anf:
 
 		; AC0 = (long)(*rho) * x[k];
 		; AC0 += 0x00000400;
-		amar *AR0, XAR4
-		aadd T1, AR4
+		amar *AR0, XAR4					; load the data contained in the AR0 to XAR4
+		aadd T1, AR4					; index k add to address contained in XAR4 => x[k]
 		mov #400h, AC0
-		macm *AR2, *AR4, AC0, AC0
+		macm *AR2, *AR4, AC0, AC0		; (long)(*rho) * x[k]
 		; AC0 >>= 11; (AC0 >> 2)
 		sfts AC0, #-13, AC0
 		mov AC0, T3
@@ -94,15 +95,15 @@ _anf:
    		; AC0 += 0x00000400;
 		mov #400h, AC0
 		; AC0 = (long)a_i * (AC0 >> 2);
-		macm *AR1, T3, AC0, AC0
+		macm *AR1, T3, AC0, AC0			; a(m-1)*rho(m)*s(m-1)
     	; AC0 >>= 11;
     	sfts AC0, #-11, AC0
     	; AC1 = -(long)a_i * x[k];
 		mov XAR0, XAR4
-		add T1, AR4
+		add T1, AR4						; index k add to address contained in XAR4 => x[k]
     	; AC1 += 0x00000100;
 		mov #100h, AC1
-		macm *AR1, *AR4, AC1, AC1
+		macm *AR1, *AR4, AC1, AC1		; a(m-1)*s(m-1)
     	; AC1 >>= 9;
 		sfts AC1, #-9, AC1
 
