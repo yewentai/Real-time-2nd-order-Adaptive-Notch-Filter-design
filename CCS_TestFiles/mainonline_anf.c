@@ -61,7 +61,7 @@ int main() {
     // Implementation goes here...
     y = left;  // Assuming you want to process the left channel
     // Comment out anf function to debug if microphone is working properly
-    e = anf(y, &s, &a, &rho, &index); // Process left channel
+    e = anf(y, &s[0], &a[0], &rho[0], &index); // Process left channel
     // Write to output file for evaluation
     // Convert 16-bit integer back to 2 bytes in little-endian format
     temp[0] = (short) (e & 0x00FF);

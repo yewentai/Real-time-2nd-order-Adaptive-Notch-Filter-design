@@ -70,6 +70,7 @@ _anf:
 		mack T3, LAMBDA, AC0, AC0
     	; AC0 >>= 15;
     	sfts AC0, #-15, AC0
+
     	; AC1 = (long)lambda2 * rho[1];
     	; AC1 += 0x00004000;
     	mov #4000h, AC1
@@ -98,7 +99,8 @@ _anf:
 		macm *AR1, T3, AC0, AC0			; a(m-1)*rho(m)*s(m-1)
     	; AC0 >>= 11;
     	sfts AC0, #-11, AC0
-    	; AC1 = -(long)a_i * x[k];
+    	
+		; AC1 = -(long)a_i * x[k];
 		mov XAR0, XAR4
 		add T1, AR4						; index k add to address contained in XAR4 => x[k]
     	; AC1 += 0x00000100;
@@ -120,7 +122,7 @@ set1:
 		mov #0, T1
 continue1:
 
-    	; AC1 += x[k];
+    	; AC1 += x[k]; for e[]
 		mov XAR0, XAR4
 		add T1, AR4
 		sub *AR4 << #4, AC1, AC1 ; subtract because we didn't negate
@@ -194,7 +196,7 @@ continue3:
     	macm *SP(#0), T3, AC0, AC0
     	; AC0 >>= 15;
     	sfts AC0, #-15, AC0
-    	; a_i += (short)((AC0 + 0x2) >> 2);
+    	; a_i += (short)((AC0 + 0x2) >> 2);           
     	add #2, AC0
 		sfts AC0, #-2, AC0
     	add T2, AC0
@@ -217,7 +219,7 @@ continue4:
     	mov #-4000h, AR4
 		cmp T2 < AR4, TC1
     	bcc set5, TC1
-    	b continue5
+    	b continueche5
 set5:
         ;      a_i = -0x4000;
 		mov #-4000h, T2

@@ -91,11 +91,11 @@ int anf(int y, int *s, int *a, unsigned int* rho, unsigned int* index)
     // Advance k back to m
     k = (k + 2) % 3;
 
-    // necessary check to see if |a| < 2
-    if (*a < -0x4000)
-        *a = -0x4000;
-    if (*a > 0x4000)
-        *a= 0x4000;
+    // necessary check to see if |a| < 2 (16q15)
+    if (*a < -0x07FFF)
+        *a = -0x7FFF;
+    if (*a > 0x7FFF)
+        *a= 0x7FFF;
 
     *index = k; // Update the circular buffer index
 
