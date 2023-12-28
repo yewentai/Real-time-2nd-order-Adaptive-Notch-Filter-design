@@ -10,29 +10,29 @@
 
 #include "stdio.h"
 #include "anf.h"
+extern int anf(short y, short *X , unsigned short *A, unsigned short *rho, int* index);
 
 /* ------------------------------------------------------------------------ *
  *                                                                          *
  *  main( )                                                                 *
  *                                                                          *
  * ------------------------------------------------------------------------ */
-int main( void ) 
+int main( void )
 {
-	int y, e, tmp1;
-	unsigned int index = 0;
-	
+	short y, e, tmp1;
+	int index = 0; // [-2,2]
+
 	FILE  *fpIn;
 	FILE  *fpOut;
-	
-	char  temp[2];
 
-	int s[3] = {0};
-	int a[2] = {0x2000};
-	int rho[2] = {0x6666}; // Fixed-point representation of 0.8 in 32q31 format
-	// int rho[2] = {0, 0}; // rho adaptive {rho=?, rho_inf}
+	char  tempc[2];
+
+	short s[3] = {0,0,0};
+	unsigned short a = {0x2000};
+	unsigned short rho[2] = {0xCCCC,0xCCCC}; // Fixed-point representation of 0.8 in 32q31 format
 
 	fpIn = fopen("..\\data\\input.pcm", "rb");
-	fpOut = fopen("..\\data\\output.pcm", "wb");
+	fpOut = fopen("..\\data\\output_off_assy_test.pcm", "wb");
 
 	if (fpIn == NULL || fpOut == NULL) {
 	    printf("Can't open input or output file. Exiting. \n");
@@ -40,18 +40,18 @@ int main( void )
 	}
 
     //Begin filtering the data
-    while (fread(temp, sizeof(char), 2, fpIn) == 2) {
+    while (fread(tempc, sizeof(char), 2, fpIn) == 2) {
         // Convert 2 bytes to 16-bit integer assuming little-endian format
-        y = (temp[0] & 0xFF) | (temp[1] << 8);
-        
+        y = (tempc[0] & 0xFF) | (tempc[1] << 8);
+
         // Call ANF function; ensure anf() is implemented for fixed-point
-        e = anf(y, &s[0], &a[0], &rho[0], &index); // Adaptive Notch Filter.
-        
+        e = anf(y, &s[0], &a, &rho[0], &index); // Adaptive Notch Filter.
+
         // Convert 16-bit integer back to 2 bytes in little-endian format
-        temp[0] = (short) (e & 0x00FF);
-        temp[1] = (short) (e & 0xFF00) >> 8;
-        
-        fwrite(temp, sizeof(char), 2, fpOut);
+        tempc[0] = (short) (e & 0x00FF);
+        tempc[1] = (short) (e & 0xFF00) >> 8;
+
+        fwrite(tempc, sizeof(char), 2, fpOut);
     }
 
     fclose(fpIn);

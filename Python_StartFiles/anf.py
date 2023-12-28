@@ -71,7 +71,6 @@ plt.show()
 # Write input signal to file
 ##############################################################################
 if write_to_file_flag:
-    # fix point in format 32q31 (32 bit signed integer, 31 bit fraction) expressed using astype
     import file_parser as fp
     q = 15
     signal_q = (signal * (2 ** q)).astype(np.int16)

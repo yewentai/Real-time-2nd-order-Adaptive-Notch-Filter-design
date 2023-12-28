@@ -13,16 +13,20 @@
 
 // Define the fixed-point format for a (16q15 in this case)
 #define A_Q_FORMAT 15
-
+#define RHO_Q_FORMAT    16
+#define L_Q_FORMAT  15
+#define S_Q_FORMAT  11
+#define A_Q_FORMAT  15
+#define E_Q_FORMAT  15
 // Define the step size, mu, properly scaled for the fixed-point format
 // mu is always < 1, hence using 0q16 format
 #define mu 0xC8 // 16q15, approximately 200 in decimal
 
 // Define lambda and one_minus_lambda for 0q16 format
 // Both are always <= 1, hence using 16q15 format
-#define lambda 0x7333 // Approximately 0.9 in 16q15 format
-#define one_minus_lambda 0x0CCD // Approximately 0.1 in 16q15 format
+#define lambda 0x4CCC //0x7333 // Approximately 0.9 in 16q15 format
+#define one_minus_lambda 0x3333 //0x0CCD // Approximately 0.1 in 16q15 format
 
-int anf(int y, int *s , int *a, unsigned int* rho, unsigned int* index);
+int anf(short y, short *s , unsigned short *a, unsigned short *rho, int* index);
 
 #endif
