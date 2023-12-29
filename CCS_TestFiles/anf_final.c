@@ -14,7 +14,8 @@ int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
     int e;         // Error signal
     long AC0, AC1; // Temporay 32 bit accumulator variables to avoid overflow
     // Update the buffer index for the circular buffer implementation
-    int k = *index; // k is now pointing in fact ot m -1
+    int k = *index; // k is now pointing in fact to m -1
+
     /** ANF-LMS Algorithm implementation */
     /**
      * Step 1: Update rho(m) = lambda * rho(m - 1) + one_minus_lambda * rho(inf)
