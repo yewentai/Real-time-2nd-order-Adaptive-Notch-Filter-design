@@ -2,13 +2,16 @@
 
 int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
 {
-    /*
-     y in Q : newly captured sample
-     s in Q : x[3] databuffer - Hint: Reserve a sufficiently number of integer bits such that summing intermediate values does not cause overflow (so no shift is needed after summing numbers)
-     a in  : the adaptive coefficient
-     e in Q : output signal
-     rho in Q : variable {rho, rho_inf} pole radius
-     index : points to (t-1) sample (t current time index) in s -> circular buffer
+    /**
+     * Implements an adaptive notch filter (ANF) using the LMS algorithm.
+     * @param y The newly captured sample (input signal).
+     * @param s Pointer to a buffer holding the last three samples.
+     * @param a Pointer to the adaptive filter coefficient.
+     * @param rho Array containing the current and asymptotic values of rho.
+     * @param index Pointer to the current index in the circular buffer s.
+     * @return The output signal after processing.
+     * This function processes the input signal through an ANF. The filter coefficient adapts based on the input
+     * and updates its part of the circular buffer. The function returns the output of the filter.
      */
 
     int e;         // Error signal
@@ -19,7 +22,6 @@ int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
     /** ANF-LMS Algorithm implementation */
     /**
      * Step 1: Update rho(m) = lambda * rho(m - 1) + one_minus_lambda * rho(inf)
-     * modify rho section
      * rho[0] is rho(m-1), rho[1] = rho(+infinite)
      * compute the latest rho[m] using rho[0] since rho[m-1] is no longer needed
      */
@@ -35,7 +37,6 @@ int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
 
     /**
      * Step 2: Update s(m) = y(m) + rho(m)a(m - 1)s(m - 1) - rho(m)^2 s(m - 2)
-     * modify s section
      * compute rho[0] square
      * compute terms for s[m]*/
     // Calculate rho squared avoiding overflow
@@ -70,14 +71,15 @@ int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
 
     /**
      * Step 3: Update error e(m) = s(m) - a(m - 1)s(m - 1) + s(m - 2)
-     * modify e section
      * compute terms for s[m]
      * */
     e += s[k];
     e <<= 4; // shift left 4 bits to normalize to 16q15
 
-    // Step 3: Update a[m]
-    // Assuming mu is in 16q15 format
+    /**
+     * Step 4: Update a(m) = a(m - 1) + 2µe(m)s(m - 1)
+     * compute terms for a[m]
+     * */
     AC0 = (long)mu * e; // 16q15 * 16q15 = 32q30
     AC0 <<= 1;          // 2 * µ * e(m)
     AC0 >>= A_Q_FORMAT; // 32q15
