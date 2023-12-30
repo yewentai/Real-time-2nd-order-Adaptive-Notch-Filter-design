@@ -27,7 +27,8 @@ int anf(short y, short *s, unsigned short *a, unsigned short *rho, int *index)
      */
 
     AC0 = (long)lambda * rho[0]; /* multiplication with long to reserve enough bits avoid overflow => 16q15 * 16q16 = 32q31 */
-    /** no need adding 0x00004000 since it's desired to maintain all the fractional bits without rounding, as we're representing a number in the range 0 to 1 with no integer part.*/
+    /** no need adding 0x00004000 since it's desired to maintain all the fractional bits without rounding, 
+     * as we're representing a number in the range 0 to 1 with no integer part.*/
     // AC0 += 0x00004000;  /** Round the part we'll be truncating (Carry bit of this sum will be the LSB after conversion)*/
     AC0 >>= L_Q_FORMAT;                    /** Shift q-foramt bits right to normalize fix-point => Now AC0 is 32q16 */
     AC1 = (long)one_minus_lambda * rho[1]; /* multiplication with long to reserve enough bits avoid overflow => 16q15 * 16q16 = 32q31 */
