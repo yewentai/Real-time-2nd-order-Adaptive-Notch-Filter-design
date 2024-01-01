@@ -9,9 +9,10 @@ USBSTK5515bsl/
 lnkx.cmd
 .launches/
 .settings/
-Debug/
 targetConfigs/
 
 # vscode files
 .vscode/
+
+# python files
 __pycache__/
