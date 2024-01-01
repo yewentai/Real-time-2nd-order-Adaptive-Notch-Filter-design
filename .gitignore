@@ -7,6 +7,10 @@ targetConfigs/
 USBSTK5515bsl/
 .project
 lnkx.cmd
+.launches/
+.settings/
+Debug/
+targetConfigs/
 
 # vscode files
 .vscode/
