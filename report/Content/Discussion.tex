@@ -1,0 +1,19 @@
+\section{Discussion}
+\subsection{Implementation evaluation}
+In our project, the adaptive notch filter (ANF) demonstrated substantial noise reduction capabilities, specifically at target frequencies of 400 Hz and 1200 Hz. The spectrogram analyses clearly illustrated the attenuation of these frequencies, validating the effectiveness of our ANF design in noise component removal. Moreover, the incorporation of an adaptive $\rho$ value not only added flexibility to the filter's response but also potentially enhanced its convergence speed and tracking ability, making it more suitable for dynamic signal environments.
+
+\subsection{Computational Efficiency}
+Another critical aspect for practical applications is the computational efficiency of the ANF implementation on the TMS320C5515 platform. While the clock cycles resources utilization were evaluated, memory exploitation and the trade-off relatoinship between speed and memory usage were not evaluated. Such measruements would enable a informed program development and configuration selection based on applications. 
+
+\subsection{Choice of fixed-point Q-factor for each variable}
+The current Q-format choice for $s$ is $16q11$, yet after re-evaluation, the Q format for $s$ can be set to $16q12$ given only three integer bits are needed. The one more fractional bits would allow a more precised computation.
+
+\subsection{Future Work}
+Moving forward, our research will focus on analyzing the trade-offs inherent in noise reduction, signal distortion, and computational efficiency. We aim to thoroughly explain the rationale behind the design choices in our ANF and the quantization scheme employed. Addressing the challenges encountered during the implementation phase will also be a key area of our future work. Additionally, we plan to explore potential directions for further research and improvements to enhance the filter's performance and applicability in various real-world scenarios.
+
+For objective performance evaluation, Mean Log-Spectral Signal Distortion (SD) will be employed, as referenced in \cite{5675660}. SD is a quantitative measure of sound quality, assessing distortion introduced by notch filters and howling phenomena. The mathematical formulation of SD is given by:
+\begin{equation}
+SD(t) = \sqrt{\int_0^{f_s / 2} \left(10 \log_{10} \frac{S_y(f)}{S_x(f)}\right)^2 df}
+\end{equation}
+where \( S_x(f) \) and \( S_y(f) \) represent the power spectral densities of the original and filtered signals, respectively, and \( f_s \) is the sampling frequency.
+
